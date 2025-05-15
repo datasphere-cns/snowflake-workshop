@@ -74,15 +74,19 @@ USE SCHEMA WORKSHOP.BRONZE_MERCADEO;
 
 ---
 
-## Paso 2: Crear el `STAGE` para subir el CSV
+## Paso 2: Entrar con el usuario Developer y Crear el `STAGE` para subir el CSV
 
 ```sql
-CREATE OR REPLACE STAGE STG_PRODUCTS_CSV
-  FILE_FORMAT = (
-    TYPE = 'CSV',
-    FIELD_OPTIONALLY_ENCLOSED_BY = '"',
-    SKIP_HEADER = 1
-  );
+
+
+CREATE OR REPLACE STAGE STG_PRODUCTS_DEV
+FILE_FORMAT = (
+  TYPE = 'CSV',
+  FIELD_OPTIONALLY_ENCLOSED_BY = '"',
+  SKIP_HEADER = 1
+);
+
+
 ```
 
 Esto crea un contenedor en el esquema actual donde subiremos el archivo. La opción `SKIP_HEADER = 1` indica que la primera fila del archivo contiene los nombres de las columnas y debe ser ignorada al cargar los datos.
@@ -91,19 +95,12 @@ Esto crea un contenedor en el esquema actual donde subiremos el archivo. La opci
 
 ## Paso 3: Subir el archivo `products.csv` al `STAGE`
 
-### Opción 1: Desde la interfaz web de Snowflake
 
 1. Ve a la sección "Data" en la interfaz.
 2. Navega al esquema `WORKSHOP.BRONZE_MERCADEO`.
-3. Ve a "Stages", selecciona `STG_PRODUCTS_CSV`.
+3. Ve a "Stages", selecciona `STG_PRODUCTS_DEV`.
 4. Haz clic en **"Upload"** y selecciona tu archivo `products.csv`.
 
-### Opción 2: Usando SnowSQL (CLI)
-
-```bash
-snowsql -a <cuenta> -u <usuario>
-PUT file://products.csv @WORKSHOP.BRONZE_MERCADEO.STG_PRODUCTS_CSV auto_compress=false;
-```
 
 ---
 
@@ -135,7 +132,7 @@ CREATE OR REPLACE TABLE PRODUCTS_BRONZE (
 
 ```sql
 COPY INTO PRODUCTS_BRONZE
-FROM @STG_PRODUCTS_CSV/products.csv
+FROM @STG_PRODUCTS_DEV/products.csv
 FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1)
 ON_ERROR = 'CONTINUE';
 ```
@@ -155,7 +152,7 @@ SELECT * FROM PRODUCTS_BRONZE;
 ## Paso 7: (Opcional) Limpiar el Stage
 
 ```sql
-REMOVE @STG_PRODUCTS_CSV;
+REMOVE @STG_PRODUCTS_DEV;
 ```
 
 Esto borra los archivos subidos al stage si ya no los necesitas.
@@ -179,3 +176,4 @@ Usarlos es una buena práctica recomendada
 
 ¿Dudas o sugerencias?  
 Contacta con el autor: [nelson.zepeda@datasphere.tech](mailto:nelson.zepeda@datasphere.tech)
+
