@@ -27,7 +27,7 @@ Elige el instalador adecuado para tu sistema operativo (Windows, macOS, Linux).
 **Comando base para iniciar sesión:**
 
 ```bash
-snowsql -a kixfvtu-oic64833 -u usuario_developer -p '********'
+snowsql -a kixfvtu-oic64833 -u usuario_developer
 ```
 
 > Esto abre una consola interactiva conectada a tu cuenta.
@@ -74,27 +74,20 @@ CREATE OR REPLACE TABLE PRODUCTS_BRONZE (
   price FLOAT
 );
 
+
 -- Paso 5: Cargar datos desde el STAGE
+PUT file://C:\Snowflake\CargaDatos\dataset\products.csv @STG_PRODUCTS_DEV auto_compress=false;
+
 COPY INTO PRODUCTS_BRONZE
 FROM @STG_PRODUCTS_DEV/products.csv
 FILE_FORMAT = (TYPE = 'CSV' FIELD_OPTIONALLY_ENCLOSED_BY = '"' SKIP_HEADER = 1)
 ON_ERROR = 'CONTINUE';
 
 -- Paso 6: Verificar los datos
-SELECT * FROM PRODUCTS_BRONZE;
+SELECT * FROM PRODUCTS_BRONZE LIMIT 10;
 
 -- Paso 7: (Opcional) Limpiar el STAGE
 -- REMOVE @STG_PRODUCTS_DEV;
-```
-
----
-
-## Ejecutar el script
-
-Puedes correr el script SQL directamente así:
-
-```bash
-snowsql -a kixfvtu-oic64833 -u usuario_developer -p '********' -f snowflake_stage_load.sql
 ```
 
 ---
