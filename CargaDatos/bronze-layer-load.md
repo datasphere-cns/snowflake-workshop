@@ -1,4 +1,4 @@
-# Guía Completa para Cargar un Archivo CSV a la Capa Bronze en Snowflake
+# Guía para Cargar un Archivo CSV a la Capa Bronze en Snowflake usando GUI
 
 **Autor:** Nelson Zepeda  
 **Fecha:** 2025-05-15  
