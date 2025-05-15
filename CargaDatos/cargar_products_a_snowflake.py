@@ -6,7 +6,7 @@ import os
 # Configuración de conexión
 conn = snowflake.connector.connect(
     user='usuario_developer',
-    password='Dev#2025',
+    password='*****',
     account='kixfvtu-oic64833',
     warehouse='WH_SMALL',
     database='WORKSHOP',
