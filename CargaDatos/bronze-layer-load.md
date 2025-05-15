@@ -64,13 +64,7 @@ En esta guía crearemos un **Stage interno persistente**.
 
 ---
 
-## Paso 1: Seleccionar el warehouse, base y esquema
-
-```sql
-USE ROLE ROLE_ADMIN_FULL;
-USE WAREHOUSE WH_SMALL;
-USE SCHEMA WORKSHOP.BRONZE_MERCADEO;
-```
+## Paso 1: Entrar con el usuario Developer creado en la sección Init
 
 ---
 
