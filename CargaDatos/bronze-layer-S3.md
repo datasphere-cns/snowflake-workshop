@@ -43,8 +43,8 @@ Reemplaza `<your-access-key-id>` y `<your-secret-access-key>` por tus credencial
 ```sql
 CREATE OR REPLACE TABLE ORDERS_BRONZE (
   order_id INTEGER,
-  product_id INTEGER,
   user_id INTEGER,
+  eval_set STRING,
   order_number INTEGER,
   order_dow INTEGER,
   order_hour_of_day INTEGER,
