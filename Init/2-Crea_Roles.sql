@@ -1,9 +1,5 @@
-
-
-
-
 -- ============================================================================
--- 3. CREACIÓN DE ROLES
+-- 1. CREACIÓN DE ROLES
 -- ============================================================================
 CREATE OR REPLACE ROLE ROLE_DEVELOPER;
 CREATE OR REPLACE ROLE ROLE_ADMIN_FULL;
@@ -15,7 +11,7 @@ CREATE OR REPLACE ROLE ROLE_READONLY_RRHH;
 CREATE OR REPLACE ROLE ROLE_DATASCIENCE_READONLY;
 
 -- ============================================================================
--- 1. CREACIÓN DE WAREHOUSES
+-- 2. CREACIÓN DE WAREHOUSES
 -- ============================================================================
 CREATE OR REPLACE WAREHOUSE WH_SMALL
   WITH WAREHOUSE_SIZE = 'SMALL'
@@ -41,7 +37,7 @@ CREATE OR REPLACE WAREHOUSE WH_LARGE
 
 
 -- ============================================================================
--- 4. PERMISOS PARA DEV y ADMIN
+-- 3. PERMISOS PARA DEV y ADMIN
 -- ============================================================================
 
 -- Acceso a la base de datos
@@ -110,7 +106,7 @@ GRANT USAGE ON WAREHOUSE WH_LARGE TO ROLE ROLE_DEVELOPER;
 
 
 -- ============================================================================
--- 5. PERMISOS DE LECTURA PARA ROLES FUNCIONALES
+-- 4. PERMISOS DE LECTURA PARA ROLES FUNCIONALES
 -- ============================================================================
 -- MERCADEO
 GRANT USAGE ON DATABASE WORKSHOP TO ROLE ROLE_READONLY_MERCADEO;
@@ -131,7 +127,7 @@ GRANT SELECT ON FUTURE TABLES IN DATABASE WORKSHOP TO ROLE ROLE_DATASCIENCE_READ
 GRANT USAGE ON WAREHOUSE WH_SMALL TO ROLE ROLE_DATASCIENCE_READONLY;
 
 -- ============================================================================
--- 6. CREACIÓN DE USUARIOS Y ASIGNACIÓN DE ROLES
+-- 5. CREACIÓN DE USUARIOS Y ASIGNACIÓN DE ROLES
 -- ============================================================================
 CREATE OR REPLACE USER usuario_admin PASSWORD='Admin#2025' DEFAULT_ROLE=ROLE_ADMIN_FULL DEFAULT_WAREHOUSE=WH_SMALL;
 CREATE OR REPLACE USER usuario_mercadeo PASSWORD='Mercadeo#2025' DEFAULT_ROLE=ROLE_READONLY_MERCADEO DEFAULT_WAREHOUSE=WH_SMALL;
