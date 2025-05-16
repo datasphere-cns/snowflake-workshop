@@ -1,0 +1,144 @@
+type: "orchestration"
+version: "1.0"
+pipeline:
+  components:
+    Start:
+      type: "start"
+      transitions:
+        unconditional:
+        - "Load Orders"
+        - "Load Products"
+      parameters:
+        componentName: "Start"
+    Load Orders:
+      type: "s3-load"
+      transitions:
+        success:
+        - "End Success"
+      parameters:
+        componentName: "Load Orders"
+        stage: "STG_ORDERS_S3"
+        pattern: "orders*.csv"
+        warehouse: "WH_SMALL"
+        database: "WORKSHOP"
+        schema: "BRONZE_MERCADEO"
+        targetTable: "ORDERS_BRONZE"
+        loadColumns:
+        - "DAYS_SINCE_PRIOR_ORDER"
+        - "EVAL_SET"
+        - "ORDER_DOW"
+        - "ORDER_HOUR_OF_DAY"
+        - "ORDER_ID"
+        - "ORDER_NUMBER"
+        - "USER_ID"
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter:
+        fieldDelimiter:
+        skipHeader:
+        skipBlankLines: "False"
+        dateFormat:
+        timeFormat:
+        timestampFormat:
+        escape:
+        escapeUnenclosedField:
+        trimSpace: "False"
+        fieldOptionallyEnclosed:
+        nullIf:
+        errorOnColumnCountMismatch: "False"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType:
+        onError: "Abort Statement"
+        sizeLimitB:
+        purgeFiles: "False"
+        truncateColumns: "True"
+        forceLoad: "False"
+        metadataFields:
+      postProcessing:
+        updateScalarVariables:
+    End Success:
+      type: "end-success"
+      parameters:
+        componentName: "End Success"
+      postProcessing:
+        updateScalarVariables:
+    Load Products:
+      type: "s3-load"
+      transitions:
+        success:
+        - "End Success 2"
+      parameters:
+        componentName: "Load Products"
+        stage: "STG_PRODUCTS_DEV"
+        pattern: "product*.csv"
+        warehouse: "WH_SMALL"
+        database: "WORKSHOP"
+        schema: "BRONZE_MERCADEO"
+        targetTable: "PRODUCTS_BRONZE"
+        loadColumns:
+        - "CATEGORY"
+        - "PRICE"
+        - "PRODUCT_ID"
+        - "PRODUCT_NAME"
+        format: "[Custom]"
+        fileType: "CSV"
+        compression: "AUTO"
+        recordDelimiter:
+        fieldDelimiter:
+        skipHeader:
+        skipBlankLines: "False"
+        dateFormat:
+        timeFormat:
+        timestampFormat:
+        escape:
+        escapeUnenclosedField:
+        trimSpace: "False"
+        fieldOptionallyEnclosed:
+        nullIf:
+        errorOnColumnCountMismatch: "False"
+        emptyFieldAsNull: "True"
+        replaceInvalidCharacters: "False"
+        encodingType:
+        onError: "Abort Statement"
+        sizeLimitB:
+        purgeFiles: "False"
+        truncateColumns: "True"
+        forceLoad: "False"
+        metadataFields:
+      postProcessing:
+        updateScalarVariables:
+    End Success 2:
+      type: "end-success"
+      parameters:
+        componentName: "End Success 2"
+      postProcessing:
+        updateScalarVariables:
+design:
+  components:
+    Start:
+      position:
+        x: -600
+        "y": -130
+      tempMetlId: 1
+    Load Orders:
+      position:
+        x: -470
+        "y": -220
+      tempMetlId: 2
+    End Success:
+      position:
+        x: -300
+        "y": -220
+      tempMetlId: 3
+    Load Products:
+      position:
+        x: -470
+        "y": -60
+      tempMetlId: 4
+    End Success 2:
+      position:
+        x: -300
+        "y": -60
+      tempMetlId: 5
