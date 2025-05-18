@@ -80,7 +80,7 @@ Utilizaremos el bucket `snow.workshop.jobrecommendation` en la región `us-east-
 
 ```sql
 CREATE OR REPLACE STAGE job_stage
-  URL = 's3://snow.workshop.jobrecommendation/jobdata/'
+  URL = 's3://snow.workshop.jobrecommendation/'
   CREDENTIALS = (
     AWS_KEY_ID = 'TU_AWS_KEY_ID'
     AWS_SECRET_KEY = 'TU_AWS_SECRET_KEY'
