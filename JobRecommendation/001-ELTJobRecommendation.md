@@ -94,16 +94,16 @@ CREATE OR REPLACE STAGE job_stage
 
 ```sql
 CREATE OR REPLACE TABLE apps (
-  UserID NUMBER,
-  WindowID NUMBER,
+  UserID STRING,
+  WindowID STRING,
   Split STRING,
   ApplicationDate TIMESTAMP,
-  JobID NUMBER
+  JobID STRING
 );
 
 CREATE OR REPLACE TABLE users (
-  UserID NUMBER,
-  WindowID NUMBER,
+  UserID STRING,
+  WindowID STRING,
   Split STRING,
   City STRING,
   State STRING,
@@ -111,16 +111,16 @@ CREATE OR REPLACE TABLE users (
 );
 
 CREATE OR REPLACE TABLE user_history (
-  UserID NUMBER,
-  WindowID NUMBER,
+  UserID STRING,
+  WindowID STRING,
   Split STRING,
-  Sequence NUMBER,
+  Sequence STRING,
   JobTitle STRING
 );
 
 CREATE OR REPLACE TABLE jobs (
-  JobID NUMBER,
-  WindowID NUMBER,
+  JobID STRING,
+  WindowID STRING,
   Title STRING,
   Description STRING,
   StartDate TIMESTAMP,
@@ -128,7 +128,7 @@ CREATE OR REPLACE TABLE jobs (
 );
 
 CREATE OR REPLACE TABLE window_dates (
-  Window NUMBER,
+  Window STRING,
   TrainStart TIMESTAMP,
   TrainEnd TIMESTAMP,
   TestStart TIMESTAMP,
