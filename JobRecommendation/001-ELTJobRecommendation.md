@@ -129,13 +129,19 @@ CREATE OR REPLACE TABLE user_history (
 );
 
 CREATE OR REPLACE TABLE jobs (
-  JobID STRING,
-  WindowID STRING,
+  JobID NUMBER,
+  WindowID NUMBER,
   Title STRING,
   Description STRING,
-  StartDate TIMESTAMP,
-  EndDate TIMESTAMP
+  Requirements STRING,
+  City STRING,
+  State STRING,
+  Country STRING,
+  Zip5 STRING,
+  StartDate TIMESTAMP_NTZ,
+  EndDate TIMESTAMP_NTZ
 );
+
 
 CREATE OR REPLACE TABLE window_dates (
   Window STRING,
