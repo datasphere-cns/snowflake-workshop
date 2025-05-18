@@ -144,11 +144,10 @@ CREATE OR REPLACE TABLE jobs (
 
 
 CREATE OR REPLACE TABLE window_dates (
-  Window STRING,
-  TrainStart TIMESTAMP,
-  TrainEnd TIMESTAMP,
-  TestStart TIMESTAMP,
-  TestEnd TIMESTAMP
+  Window NUMBER,
+  TrainStart TIMESTAMP_NTZ,
+  TestStart TIMESTAMP_NTZ,
+  TestEnd TIMESTAMP_NTZ
 );
 ```
 
