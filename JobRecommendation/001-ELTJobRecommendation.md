@@ -102,13 +102,23 @@ CREATE OR REPLACE TABLE apps (
 );
 
 CREATE OR REPLACE TABLE users (
-  UserID STRING,
-  WindowID STRING,
+  UserID NUMBER,
+  WindowID NUMBER,
   Split STRING,
   City STRING,
   State STRING,
-  Country STRING
+  Country STRING,
+  ZipCode STRING,
+  DegreeType STRING,
+  Major STRING,
+  GraduationDate TIMESTAMP_NTZ,
+  WorkHistoryCount NUMBER,
+  TotalYearsExperience NUMBER,
+  CurrentlyEmployed STRING,
+  ManagedOthers STRING,
+  ManagedHowMany NUMBER
 );
+
 
 CREATE OR REPLACE TABLE user_history (
   UserID STRING,
