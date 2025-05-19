@@ -3,6 +3,30 @@
 
 Este flujo implementa una dimensión lentamente cambiante (SCD Tipo 2) basada en la tabla enriquecida `users_silver`, manteniendo un histórico de los cambios en la capa `GOLD`.
 
+
+# Permisos requeridos para ejecutar la carga SCD2 en la capa GOLD
+
+Antes de ejecutar la creación de tablas, procedimientos o tareas en el esquema `workshop.gold_analitica`, es necesario que el rol `role_developer` cuente con los permisos adecuados.
+
+A continuación se detallan los comandos que debe ejecutar un usuario con rol `ACCOUNTADMIN` o propietario de la base de datos:
+
+```sql
+-- Otorgar acceso al esquema
+GRANT USAGE ON SCHEMA workshop.gold_analitica TO ROLE role_developer;
+
+-- Permitir crear tablas
+GRANT CREATE TABLE ON SCHEMA workshop.gold_analitica TO ROLE role_developer;
+
+-- Permitir crear procedimientos
+GRANT CREATE PROCEDURE ON SCHEMA workshop.gold_analitica TO ROLE role_developer;
+
+-- Permitir operaciones de lectura y escritura sobre todas las tablas existentes
+GRANT INSERT, SELECT, UPDATE, DELETE ON ALL TABLES IN SCHEMA workshop.gold_analitica TO ROLE role_developer;
+```
+
+Una vez otorgados estos permisos, el rol `role_developer` podrá ejecutar la carga y mantenimiento de la dimensión `users_dim` de forma completa en la capa ORO.
+
+
 ---
 
 ## 1. Crear tabla destino: `users_dim` (modelo SCD Type 2)
