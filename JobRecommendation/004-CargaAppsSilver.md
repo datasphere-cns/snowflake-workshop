@@ -168,14 +168,6 @@ FROM workshop.bronze_recursos_humanos.carga_logs
 ORDER BY FechaCarga DESC;
 ```
 
-### Consultar uso del PIPE
-
-```sql
-SELECT *
-FROM workshop.information_schema.pipe_usage_history
-WHERE pipe_name = 'APPS_PIPE'
-ORDER BY start_time DESC;
-```
 
 ---
 
