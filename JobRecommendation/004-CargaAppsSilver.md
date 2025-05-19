@@ -1,5 +1,5 @@
 
-# 🔐 Requisitos de permisos antes de usar Snowpipe
+# Requisitos de permisos antes de usar Snowpipe
 
 Antes de crear un PIPE o ejecutar tareas automáticas, asegúrate de que el rol con el que estás trabajando (ej. `usuario_dev`) tenga los permisos necesarios.
 
