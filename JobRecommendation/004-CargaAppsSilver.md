@@ -1,7 +1,26 @@
 
+# 🔐 Requisitos de permisos antes de usar Snowpipe
+
+Antes de crear un PIPE o ejecutar tareas automáticas, asegúrate de que el rol con el que estás trabajando (ej. `usuario_dev`) tenga los permisos necesarios.
+
+## ✅ Si tienes acceso a un rol con privilegios administrativos
+
+Solicita o ejecuta los siguientes comandos con un rol como `ACCOUNTADMIN` o el propietario del esquema:
+
+```sql
+GRANT USAGE ON DATABASE workshop TO ROLE usuario_dev;
+GRANT USAGE ON SCHEMA workshop.bronze_recursos_humanos TO ROLE usuario_dev;
+GRANT CREATE PIPE ON SCHEMA workshop.bronze_recursos_humanos TO ROLE usuario_dev;
+```
+
+> Si no tienes permisos para ejecutar estos `GRANT`, contacta al administrador de Snowflake para solicitarlos antes de continuar.
+
+---
+
+
 # Automatización de carga BRONZE → SILVER con Snowpipe + Task + Logs
 
-Este flujo implementa la carga continua y controlada de archivos desde S3 usando Snowpipe, con trazabilidad y separación entre zonas BRONZE y SILVER.
+Ahora conectate con el usuario_developer. Este flujo implementa la carga continua y controlada de archivos desde S3 usando Snowpipe, con trazabilidad y separación entre zonas BRONZE y SILVER.
 
 ---
 
