@@ -6,7 +6,7 @@ Este flujo implementa una dimensión lentamente cambiante (SCD Tipo 2) basada en
 
 # Permisos requeridos para ejecutar la carga SCD2 en la capa GOLD
 
-Antes de ejecutar la creación de tablas, procedimientos o tareas en el esquema `workshop.gold_analitica`, es necesario que el rol `role_developer` cuente con los permisos adecuados.
+Antes de ejecutar la creación de tablas, procedimientos o tareas en el esquema `workshop.gold_recursos_humanos`, es necesario que el rol `role_developer` cuente con los permisos adecuados.
 
 A continuación se detallan los comandos que debe ejecutar un usuario con rol `ACCOUNTADMIN` o propietario de la base de datos:
 
