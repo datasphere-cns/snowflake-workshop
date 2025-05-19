@@ -90,8 +90,6 @@ RETURNS STRING
 LANGUAGE SQL
 AS
 $$
-DECLARE
-  inserted_rows NUMBER;
 BEGIN
   -- Insertar en tabla final con auditoría
   INSERT INTO workshop.silver_recursos_humanos.apps_silver (
@@ -109,10 +107,7 @@ BEGIN
     NULL
   FROM workshop.bronze_recursos_humanos.apps_stage;
 
-  -- CORRECTO
-  SET inserted_rows = ROW_COUNT;
-
-  -- Registrar en logs
+  -- Registrar en logs (sin contar filas)
   INSERT INTO workshop.bronze_recursos_humanos.carga_logs (
     TablaDestino,
     Archivo,
@@ -125,17 +120,18 @@ BEGIN
     'workshop.silver_recursos_humanos.apps_silver',
     NULL,
     CURRENT_TIMESTAMP,
-    inserted_rows,
+    NULL,
     'snowpipe_apps_pipe',
-    'Carga diaria automática desde staging'
+    'Carga ejecutada con SQL sin contador de filas'
   );
 
   -- Limpiar staging
   TRUNCATE TABLE workshop.bronze_recursos_humanos.apps_stage;
 
-  RETURN 'Carga completada con ' || inserted_rows || ' filas.';
+  RETURN 'Carga ejecutada correctamente desde apps_stage hacia apps_silver.';
 END;
 $$;
+
 ```
 
 ---
