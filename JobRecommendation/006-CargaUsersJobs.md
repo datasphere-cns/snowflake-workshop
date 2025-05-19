@@ -1,7 +1,7 @@
 
 # Automatización de carga BRONZE → SILVER con Snowpipe + Task + Logs (USERS y JOBS)
 
-Ahora conéctate con el rol `usuario_developer`. Este flujo implementa la carga continua y controlada de archivos desde S3 usando Snowpipe, con trazabilidad y separación entre zonas BRONZE y SILVER.
+Ahora conéctate con el `usuario_developer`. Este flujo implementa la carga continua y controlada de archivos desde S3 usando Snowpipe, con trazabilidad y separación entre zonas BRONZE y SILVER.
 
 ---
 
