@@ -91,30 +91,29 @@ LANGUAGE SQL
 AS
 $$
 BEGIN
-  -- Insertar en tabla final con auditoría
-  INSERT INTO workshop.silver_recursos_humanos.apps_silver (
-    UserID, WindowID, Split, ApplicationDate, JobID,
-    FechaHoraCarga, ProcesoCarga, FuenteArchivo
-  )
-  SELECT
-    UserID,
-    WindowID,
-    Split,
-    ApplicationDate,
-    JobID,
-    CURRENT_TIMESTAMP,
-    'snowpipe_apps_pipe',
-    NULL
-  FROM workshop.bronze_recursos_humanos.apps_stage;
+  -- Cargar datos nuevos desde staging a SILVER usando MERGE
+  MERGE INTO workshop.silver_recursos_humanos.apps_silver AS target
+  USING (
+    SELECT 
+      UserID, WindowID, Split, ApplicationDate, JobID
+    FROM workshop.bronze_recursos_humanos.apps_stage
+  ) AS source
+  ON target.UserID = source.UserID
+     AND target.WindowID = source.WindowID
+     AND target.JobID = source.JobID
+  WHEN NOT MATCHED THEN
+    INSERT (
+      UserID, WindowID, Split, ApplicationDate, JobID,
+      FechaHoraCarga, ProcesoCarga, FuenteArchivo
+    )
+    VALUES (
+      source.UserID, source.WindowID, source.Split, source.ApplicationDate, source.JobID,
+      CURRENT_TIMESTAMP, 'snowpipe_apps_pipe', NULL
+    );
 
-  -- Registrar en logs (sin contar filas)
+  -- Registrar log (sin conteo exacto)
   INSERT INTO workshop.bronze_recursos_humanos.carga_logs (
-    TablaDestino,
-    Archivo,
-    FechaCarga,
-    RegistrosCargados,
-    Proceso,
-    Observaciones
+    TablaDestino, Archivo, FechaCarga, RegistrosCargados, Proceso, Observaciones
   )
   VALUES (
     'workshop.silver_recursos_humanos.apps_silver',
@@ -122,16 +121,15 @@ BEGIN
     CURRENT_TIMESTAMP,
     NULL,
     'snowpipe_apps_pipe',
-    'Carga ejecutada con SQL sin contador de filas'
+    'Carga ejecutada con MERGE para evitar duplicados'
   );
 
   -- Limpiar staging
   TRUNCATE TABLE workshop.bronze_recursos_humanos.apps_stage;
 
-  RETURN 'Carga ejecutada correctamente desde apps_stage hacia apps_silver.';
+  RETURN 'Carga ejecutada correctamente con MERGE.';
 END;
 $$;
-
 ```
 
 ---
