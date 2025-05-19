@@ -144,7 +144,7 @@ $$;
 
 ```sql
 CREATE OR REPLACE TASK workshop.silver_recursos_humanos.enrich_apps_silver
-  WAREHOUSE = WH_XS
+  WAREHOUSE = WH_SMALL
   SCHEDULE = 'USING CRON 0 3 * * * UTC'
 AS
 CALL workshop.silver_recursos_humanos.proc_enrich_apps_silver();
