@@ -33,7 +33,7 @@ Una vez otorgados estos permisos, el rol `role_developer` podrá ejecutar la car
 ## 1. Crear tabla destino: `users_dim` (modelo SCD Type 2)
 
 ```sql
-CREATE OR REPLACE TABLE workshop.gold_analitica.users_dim (
+CREATE OR REPLACE TABLE workshop.gold_recursos_humanos.users_dim (
   UserID NUMBER,
   WindowID NUMBER,
   Split STRING,
@@ -62,14 +62,14 @@ CREATE OR REPLACE TABLE workshop.gold_analitica.users_dim (
 ## 2. Crear procedimiento para mantener la dimensión `users_dim` con cambios
 
 ```sql
-CREATE OR REPLACE PROCEDURE workshop.gold_analitica.proc_scdfill_users_dim()
+CREATE OR REPLACE PROCEDURE workshop.gold_recursos_humanos.proc_scdfill_users_dim()
 RETURNS STRING
 LANGUAGE SQL
 AS
 $$
 BEGIN
   -- 1. Cierra registros antiguos que han cambiado
-  UPDATE workshop.gold_analitica.users_dim AS d
+  UPDATE workshop.gold_recursos_humanos .users_dim AS d
   SET FechaFin = CURRENT_DATE - 1,
       EsActual = FALSE
   FROM workshop.silver_recursos_humanos.users_silver AS s
@@ -90,7 +90,7 @@ BEGIN
     );
 
   -- 2. Inserta nuevos registros donde hay cambios o no existía el usuario
-  INSERT INTO workshop.gold_analitica.users_dim (
+  INSERT INTO workshop.gold_recursos_humanos .users_dim (
     UserID, WindowID, Split, City, State, Country, ZipCode,
     DegreeType, Major, GraduationDate, WorkHistoryCount, TotalYearsExperience,
     CurrentlyEmployed, ManagedOthers, ManagedHowMany,
@@ -102,7 +102,7 @@ BEGIN
     s.CurrentlyEmployed, s.ManagedOthers, s.ManagedHowMany,
     CURRENT_DATE, NULL, TRUE, s.ProcesoCarga, s.FuenteArchivo
   FROM workshop.silver_recursos_humanos.users_silver AS s
-  LEFT JOIN workshop.gold_analitica.users_dim AS d
+  LEFT JOIN workshop.gold_recursos_humanos .users_dim AS d
     ON s.UserID = d.UserID AND d.EsActual = TRUE
   WHERE d.UserID IS NULL
      OR (
@@ -129,17 +129,17 @@ $$;
 ## 3. (Opcional) Crear TASK para ejecución diaria
 
 ```sql
-CREATE OR REPLACE TASK workshop.gold_analitica.enrich_users_dim
+CREATE OR REPLACE TASK workshop.gold_recursos_humanos .enrich_users_dim
   WAREHOUSE = WH_SMALL
   SCHEDULE = 'USING CRON 0 4 * * * UTC'
 AS
-CALL workshop.gold_analitica.proc_scdfill_users_dim();
+CALL workshop.gold_recursos_humanos .proc_scdfill_users_dim();
 ```
 
 Activar el task:
 
 ```sql
-ALTER TASK workshop.gold_analitica.enrich_users_dim RESUME;
+ALTER TASK workshop.gold_recursos_humanos .enrich_users_dim RESUME;
 ```
 
 ---
@@ -148,7 +148,7 @@ ALTER TASK workshop.gold_analitica.enrich_users_dim RESUME;
 
 ```sql
 SELECT *
-FROM workshop.gold_analitica.users_dim
+FROM workshop.gold_recursos_humanos .users_dim
 WHERE UserID = 47
 ORDER BY FechaInicio;
 ```
