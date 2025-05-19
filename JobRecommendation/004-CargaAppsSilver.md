@@ -8,9 +8,9 @@ Antes de crear un PIPE o ejecutar tareas automáticas, asegúrate de que el rol 
 Solicita o ejecuta los siguientes comandos con un rol como `ACCOUNTADMIN` o el propietario del esquema:
 
 ```sql
-GRANT USAGE ON DATABASE workshop TO ROLE usuario_dev;
-GRANT USAGE ON SCHEMA workshop.bronze_recursos_humanos TO ROLE usuario_dev;
-GRANT CREATE PIPE ON SCHEMA workshop.bronze_recursos_humanos TO ROLE usuario_dev;
+GRANT USAGE ON DATABASE workshop TO ROLE ROLE_DEVELOPER;
+GRANT USAGE ON SCHEMA workshop.bronze_recursos_humanos TO ROLE ROLE_DEVELOPER;
+GRANT CREATE PIPE ON SCHEMA workshop.bronze_recursos_humanos TO ROLE ROLE_DEVELOPER;
 ```
 
 > Si no tienes permisos para ejecutar estos `GRANT`, contacta al administrador de Snowflake para solicitarlos antes de continuar.
