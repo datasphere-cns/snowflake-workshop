@@ -1,29 +1,28 @@
 
-# Carga Enriquecida Directa desde Stage Externo en Snowflake
+# Automatización de carga BRONZE → SILVER con Snowpipe + Task + Logs
 
-## Objetivo
-
-Usar `INSERT INTO ... SELECT` directamente desde un stage en Amazon S3 para cargar datos en tablas **RAW (zona BRONZE)**, añadiendo columnas de auditoría como:
-
-- `FechaHoraCarga`: timestamp de la carga.
-- `ProcesoCarga`: nombre del proceso o pipeline.
-- `FuenteArchivo`: nombre del archivo cargado.
+Este flujo implementa la carga continua y controlada de archivos desde S3 usando Snowpipe, con trazabilidad y separación entre zonas BRONZE y SILVER.
 
 ---
 
-## Requisitos
+## 1. Estructura de tablas y esquemas
 
-- Stage externo creado correctamente (`@job_stage`).
-- Archivo `.tsv` disponible en `s3://snow.workshop.jobrecommendation/jobdata/`.
-- File format configurado como `job_tsv_format` con separador `\t`.
-- Tablas destino creadas con columnas de datos **+** columnas de control.
-
----
-
-## 1. Tabla `apps_raw`
+### Tabla de staging (`apps_stage`) en zona BRONZE
 
 ```sql
-CREATE OR REPLACE TABLE apps_raw (
+CREATE OR REPLACE TABLE workshop.bronze_recursos_humanos.apps_stage (
+  UserID STRING,
+  WindowID STRING,
+  Split STRING,
+  ApplicationDate TIMESTAMP_NTZ,
+  JobID STRING
+);
+```
+
+### Tabla enriquecida (`apps_silver`) en zona SILVER
+
+```sql
+CREATE OR REPLACE TABLE workshop.silver_recursos_humanos.apps_silver (
   UserID STRING,
   WindowID STRING,
   Split STRING,
@@ -33,181 +32,133 @@ CREATE OR REPLACE TABLE apps_raw (
   ProcesoCarga STRING,
   FuenteArchivo STRING
 );
-
-INSERT INTO apps_raw (
-  UserID, WindowID, Split, ApplicationDate, JobID,
-  FechaHoraCarga, ProcesoCarga, FuenteArchivo
-)
-SELECT
-  $1::STRING,
-  $2::STRING,
-  $3::STRING,
-  $4::TIMESTAMP_NTZ,
-  $5::STRING,
-  CURRENT_TIMESTAMP,
-  'manual_script',
-  METADATA$FILENAME
-FROM @job_stage/apps.tsv
-(FILE_FORMAT => job_tsv_format);
 ```
 
----
-
-## 2. Tabla `users_raw`
+### Tabla de logs
 
 ```sql
-CREATE OR REPLACE TABLE users_raw (
-  UserID NUMBER,
-  WindowID NUMBER,
-  Split STRING,
-  City STRING,
-  State STRING,
-  Country STRING,
-  ZipCode STRING,
-  DegreeType STRING,
-  Major STRING,
-  GraduationDate TIMESTAMP_NTZ,
-  WorkHistoryCount NUMBER,
-  TotalYearsExperience NUMBER,
-  CurrentlyEmployed STRING,
-  ManagedOthers STRING,
-  ManagedHowMany NUMBER,
-  FechaHoraCarga TIMESTAMP_NTZ,
-  ProcesoCarga STRING,
-  FuenteArchivo STRING
+CREATE OR REPLACE TABLE workshop.bronze_recursos_humanos.carga_logs (
+  TablaDestino STRING,
+  Archivo STRING,
+  FechaCarga TIMESTAMP_NTZ,
+  RegistrosCargados NUMBER,
+  Proceso STRING,
+  Observaciones STRING
 );
-
-INSERT INTO users_raw
-SELECT
-  $1::NUMBER,
-  $2::NUMBER,
-  $3::STRING,
-  $4::STRING,
-  $5::STRING,
-  $6::STRING,
-  $7::STRING,
-  $8::STRING,
-  $9::STRING,
-  $10::TIMESTAMP_NTZ,
-  $11::NUMBER,
-  $12::NUMBER,
-  $13::STRING,
-  $14::STRING,
-  $15::NUMBER,
-  CURRENT_TIMESTAMP,
-  'manual_script',
-  METADATA$FILENAME
-FROM @job_stage/users.tsv
-(FILE_FORMAT => job_tsv_format);
 ```
 
 ---
 
-## 3. Tabla `user_history_raw`
+## 2. Crear Snowpipe para carga automática en tabla de staging
 
 ```sql
-CREATE OR REPLACE TABLE user_history_raw (
-  UserID STRING,
-  WindowID STRING,
-  Split STRING,
-  Sequence STRING,
-  JobTitle STRING,
-  FechaHoraCarga TIMESTAMP_NTZ,
-  ProcesoCarga STRING,
-  FuenteArchivo STRING
-);
-
-INSERT INTO user_history_raw
-SELECT
-  $1::STRING,
-  $2::STRING,
-  $3::STRING,
-  $4::STRING,
-  $5::STRING,
-  CURRENT_TIMESTAMP,
-  'manual_script',
-  METADATA$FILENAME
-FROM @job_stage/user_history.tsv
-(FILE_FORMAT => job_tsv_format);
+CREATE OR REPLACE PIPE workshop.bronze_recursos_humanos.apps_pipe AUTO_INGEST = TRUE
+AS
+COPY INTO workshop.bronze_recursos_humanos.apps_stage
+FROM @job_stage
+FILE_FORMAT = (FORMAT_NAME = job_tsv_format);
 ```
+
+> Este `PIPE` cargará automáticamente nuevos archivos desde el stage en S3 hacia `apps_stage`.
 
 ---
 
-## 4. Tabla `jobs_raw`
+## 3. Procedimiento para mover datos a SILVER y registrar log
 
 ```sql
-CREATE OR REPLACE TABLE jobs_raw (
-  JobID NUMBER,
-  WindowID NUMBER,
-  Title STRING,
-  Description STRING,
-  Requirements STRING,
-  City STRING,
-  State STRING,
-  Country STRING,
-  Zip5 STRING,
-  StartDate TIMESTAMP_NTZ,
-  EndDate TIMESTAMP_NTZ,
-  FechaHoraCarga TIMESTAMP_NTZ,
-  ProcesoCarga STRING,
-  FuenteArchivo STRING
-);
+CREATE OR REPLACE PROCEDURE workshop.silver_recursos_humanos.proc_enrich_apps_silver()
+RETURNS STRING
+LANGUAGE SQL
+AS
+$$
+DECLARE
+  inserted_rows NUMBER;
+BEGIN
+  -- Insertar en tabla final con auditoría
+  INSERT INTO workshop.silver_recursos_humanos.apps_silver (
+    UserID, WindowID, Split, ApplicationDate, JobID,
+    FechaHoraCarga, ProcesoCarga, FuenteArchivo
+  )
+  SELECT
+    UserID,
+    WindowID,
+    Split,
+    ApplicationDate,
+    JobID,
+    CURRENT_TIMESTAMP,
+    'snowpipe_apps_pipe',
+    NULL
+  FROM workshop.bronze_recursos_humanos.apps_stage;
 
-INSERT INTO jobs_raw
-SELECT
-  $1::NUMBER,
-  $2::NUMBER,
-  $3::STRING,
-  $4::STRING,
-  $5::STRING,
-  $6::STRING,
-  $7::STRING,
-  $8::STRING,
-  $9::STRING,
-  $10::TIMESTAMP_NTZ,
-  $11::TIMESTAMP_NTZ,
-  CURRENT_TIMESTAMP,
-  'manual_script',
-  METADATA$FILENAME
-FROM @job_stage/jobs.tsv
-(FILE_FORMAT => job_tsv_format);
+  LET inserted_rows = ROW_COUNT;
+
+  -- Registrar en logs
+  INSERT INTO workshop.bronze_recursos_humanos.carga_logs (
+    TablaDestino,
+    Archivo,
+    FechaCarga,
+    RegistrosCargados,
+    Proceso,
+    Observaciones
+  )
+  VALUES (
+    'workshop.silver_recursos_humanos.apps_silver',
+    NULL,
+    CURRENT_TIMESTAMP,
+    inserted_rows,
+    'snowpipe_apps_pipe',
+    'Carga diaria automática desde staging'
+  );
+
+  -- Limpiar staging
+  TRUNCATE TABLE workshop.bronze_recursos_humanos.apps_stage;
+
+  RETURN 'Carga completada con ' || inserted_rows || ' filas.';
+END;
+$$;
 ```
 
 ---
 
-## 5. Tabla `window_dates_raw`
+## 4. Crear TASK programado para ejecutar el procedimiento cada día a las 3:00 AM UTC
 
 ```sql
-CREATE OR REPLACE TABLE window_dates_raw (
-  Window NUMBER,
-  TrainStart TIMESTAMP_NTZ,
-  TestStart TIMESTAMP_NTZ,
-  TestEnd TIMESTAMP_NTZ,
-  FechaHoraCarga TIMESTAMP_NTZ,
-  ProcesoCarga STRING,
-  FuenteArchivo STRING
-);
+CREATE OR REPLACE TASK workshop.silver_recursos_humanos.enrich_apps_silver
+  WAREHOUSE = WH_XS
+  SCHEDULE = 'USING CRON 0 3 * * * UTC'
+AS
+CALL workshop.silver_recursos_humanos.proc_enrich_apps_silver();
+```
 
-INSERT INTO window_dates_raw
-SELECT
-  $1::NUMBER,
-  $2::TIMESTAMP_NTZ,
-  $3::TIMESTAMP_NTZ,
-  $4::TIMESTAMP_NTZ,
-  CURRENT_TIMESTAMP,
-  'manual_script',
-  METADATA$FILENAME
-FROM @job_stage/window_dates.tsv
-(FILE_FORMAT => job_tsv_format);
+Activar el task:
+
+```sql
+ALTER TASK workshop.silver_recursos_humanos.enrich_apps_silver RESUME;
 ```
 
 ---
 
-## Ventajas de este enfoque
+## 5. Verificar ejecución y logs
 
-- Puedes enriquecer los datos al momento de la carga.
-- Tienes control total sin modificar el archivo de origen.
-- Puedes auditar qué archivo cargó cada fila y cuándo.
-- Evitas pasos intermedios como staging con `COPY INTO`.
+### Consultar logs de carga
+
+```sql
+SELECT *
+FROM workshop.bronze_recursos_humanos.carga_logs
+ORDER BY FechaCarga DESC;
+```
+
+### Consultar uso del PIPE
+
+```sql
+SELECT *
+FROM workshop.information_schema.pipe_usage_history
+WHERE pipe_name = 'APPS_PIPE'
+ORDER BY start_time DESC;
+```
+
+---
+
+Este patrón permite tener trazabilidad completa, separación de zonas y automatización segura de cargas desde S3 en Snowflake.
 
 ---
