@@ -109,7 +109,8 @@ BEGIN
     NULL
   FROM workshop.bronze_recursos_humanos.apps_stage;
 
-  LET inserted_rows = ROW_COUNT;
+  -- ✅ CORRECTO
+  SET inserted_rows = ROW_COUNT;
 
   -- Registrar en logs
   INSERT INTO workshop.bronze_recursos_humanos.carga_logs (
