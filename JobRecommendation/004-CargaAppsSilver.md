@@ -3,9 +3,9 @@
 
 Antes de crear un PIPE o ejecutar tareas automáticas, asegúrate de que el rol con el que estás trabajando (ej. `usuario_dev`) tenga los permisos necesarios.
 
-## ✅ Si tienes acceso a un rol con privilegios administrativos
+## Si tienes acceso a un rol con privilegios administrativos
 
-Solicita o ejecuta los siguientes comandos con un rol como `ACCOUNTADMIN` o el propietario del esquema:
+Solicita o ejecuta los siguientes comandos con un rol como `ACCOUNTADMIN` (cambia de usuario a admin):
 
 ```sql
 GRANT USAGE ON DATABASE workshop TO ROLE ROLE_DEVELOPER;
@@ -109,7 +109,7 @@ BEGIN
     NULL
   FROM workshop.bronze_recursos_humanos.apps_stage;
 
-  -- ✅ CORRECTO
+  -- CORRECTO
   SET inserted_rows = ROW_COUNT;
 
   -- Registrar en logs
