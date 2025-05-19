@@ -12,16 +12,17 @@ A continuación se detallan los comandos que debe ejecutar un usuario con rol `A
 
 ```sql
 -- Otorgar acceso al esquema
-GRANT USAGE ON SCHEMA workshop.gold_analitica TO ROLE role_developer;
+GRANT USAGE ON SCHEMA workshop.gold_recursos_humanos TO ROLE role_developer;
 
 -- Permitir crear tablas
-GRANT CREATE TABLE ON SCHEMA workshop.gold_analitica TO ROLE role_developer;
+GRANT CREATE TABLE ON SCHEMA workshop.gold_recursos_humanos TO ROLE role_developer;
 
 -- Permitir crear procedimientos
-GRANT CREATE PROCEDURE ON SCHEMA workshop.gold_analitica TO ROLE role_developer;
+GRANT CREATE PROCEDURE ON SCHEMA workshop.gold_recursos_humanos TO ROLE role_developer;
 
 -- Permitir operaciones de lectura y escritura sobre todas las tablas existentes
-GRANT INSERT, SELECT, UPDATE, DELETE ON ALL TABLES IN SCHEMA workshop.gold_analitica TO ROLE role_developer;
+GRANT INSERT, SELECT, UPDATE, DELETE ON ALL TABLES IN SCHEMA workshop.gold_recursos_humanos TO ROLE role_developer;
+
 ```
 
 Una vez otorgados estos permisos, el rol `role_developer` podrá ejecutar la carga y mantenimiento de la dimensión `users_dim` de forma completa en la capa ORO.
