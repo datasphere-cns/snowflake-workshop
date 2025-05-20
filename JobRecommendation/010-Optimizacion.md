@@ -197,7 +197,7 @@ Snowflake provee una vista con métricas de almacenamiento que permite auditar:
 
 ```sql
 SELECT * 
-FROM TABLE(INFORMATION_SCHEMA.TABLE_STORAGE_METRICS)
+FROM INFORMATION_SCHEMA.TABLE_STORAGE_METRICS
 WHERE TABLE_NAME = 'REVIEWS_SILVER';
 ```
 
