@@ -11,7 +11,7 @@ Los datos provienen de la colección pública de reseñas de Google Local recopi
 
 - Fuente oficial: https://mcauleylab.ucsd.edu/public_datasets/gdrive/googlelocal/#complete-data
 - Archivo específico: `review-California_10.json`
-- Número total de reseñas en California: **70,529,977**
+- Número total de reseñas en California: **+66M**
 - Formato: **JSONL** (una reseña por línea)
 
 ---
