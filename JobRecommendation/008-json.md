@@ -41,27 +41,17 @@ Los datos se cargarán en:
 > Ejecutar como `ACCOUNTADMIN` o con privilegios para crear integraciones externas.
 
 ```sql
-CREATE OR REPLACE STORAGE INTEGRATION integration_s3_workshop
-  TYPE = EXTERNAL_STAGE
-  STORAGE_PROVIDER = S3
-  ENABLED = TRUE
-  STORAGE_ALLOWED_LOCATIONS = ('s3://snow.workshop.198303/reviews/')
-  STORAGE_AWS_ACCESS_KEY = '<YOUR_AWS_ACCESS_KEY>'
-  STORAGE_AWS_SECRET_KEY = '<YOUR_AWS_SECRET_KEY>';
+CREATE OR REPLACE STAGE stage_s3_reviews
+  URL = 's3://snow.workshop.198303/reviews/'
+  CREDENTIALS = (
+    AWS_KEY_ID = 'AKI......'
+    AWS_SECRET_KEY = '9TM.....'
+  )
+  FILE_FORMAT = (TYPE = JSON);
 ```
 
 >  **IMPORTANTE:** Reemplaza `YOUR_AWS_ACCESS_KEY` y `YOUR_AWS_SECRET_KEY` con tus credenciales IAM válidas con permisos `s3:GetObject` sobre el bucket.
 
----
-
-## 2. Crear el STAGE externo para S3
-
-```sql
-CREATE OR REPLACE STAGE stage_reviews_json
-  URL = 's3://snow.workshop.198303/reviews'
-  STORAGE_INTEGRATION = integration_s3_workshop
-  FILE_FORMAT = (TYPE = JSON STRIP_OUTER_ARRAY = FALSE);
-```
 
 ---
 
@@ -79,7 +69,7 @@ CREATE OR REPLACE TABLE workshop.bronze_mercadeo.reviews_raw (
 
 ```sql
 COPY INTO workshop.bronze_mercadeo.reviews_raw
-FROM @stage_reviews_json/review-California_10.json
+FROM @stage_s3_reviews/review-California.json
 FILE_FORMAT = (TYPE = JSON STRIP_OUTER_ARRAY = FALSE)
 ON_ERROR = 'CONTINUE';
 ```
