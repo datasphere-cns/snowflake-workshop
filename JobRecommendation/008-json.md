@@ -83,6 +83,11 @@ ON_ERROR = 'CONTINUE';
 ```sql
 SELECT COUNT(*) FROM workshop.bronze_mercadeo.reviews_raw;
 
+SHOW PARAMETERS LIKE 'TIMEZONE';
+ALTER SESSION SET TIMEZONE = 'America/El_Salvador';
+SHOW PARAMETERS LIKE 'TIMEZONE';
+
+
 SELECT
   review:user_id::STRING AS user_id,
   review:name::STRING AS name,
@@ -91,7 +96,7 @@ SELECT
   review:text::STRING AS text,
   review:resp.text::STRING AS response
 FROM workshop.bronze_mercadeo.reviews_raw
-LIMIT 10;
+LIMIT 40;
 ```
 
 ---
