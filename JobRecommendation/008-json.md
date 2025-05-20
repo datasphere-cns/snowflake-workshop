@@ -42,12 +42,14 @@ Los datos se cargarán en:
 
 ```sql
 CREATE OR REPLACE STAGE stage_s3_reviews
-  URL = 's3://snow.workshop.198303/reviews/'
+  URL = 's3://snow.workshop.198303/'
   CREDENTIALS = (
-    AWS_KEY_ID = 'AKI......'
-    AWS_SECRET_KEY = '9TM.....'
+    AWS_KEY_ID = 'AKIXXXXXXXXXXXXX'
+    AWS_SECRET_KEY = '9TMXXXXXXXXXXXXXXXXXX'
   )
   FILE_FORMAT = (TYPE = JSON);
+
+LIST @stage_s3_reviews;
 ```
 
 >  **IMPORTANTE:** Reemplaza `YOUR_AWS_ACCESS_KEY` y `YOUR_AWS_SECRET_KEY` con tus credenciales IAM válidas con permisos `s3:GetObject` sobre el bucket.
@@ -69,7 +71,7 @@ CREATE OR REPLACE TABLE workshop.bronze_mercadeo.reviews_raw (
 
 ```sql
 COPY INTO workshop.bronze_mercadeo.reviews_raw
-FROM @stage_s3_reviews/review-California.json
+FROM @stage_s3_reviews/reviews/review-California.json
 FILE_FORMAT = (TYPE = JSON STRIP_OUTER_ARRAY = FALSE)
 ON_ERROR = 'CONTINUE';
 ```
