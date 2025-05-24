@@ -2,6 +2,10 @@
 
 Este documento describe el proceso de implementación de una carga incremental desde la tabla `reviews_raw` en la capa Bronze hacia la tabla `reviews_silver` en la capa Silver. El procedimiento se ejecuta automáticamente todos los días a las 6:00 a.m. hora de El Salvador mediante una tarea programada en Snowflake.
 
+SHOW PARAMETERS LIKE 'TIMEZONE';
+ALTER SESSION SET TIMEZONE = 'America/El_Salvador';
+
+
 ## Código completo
 
 ```sql
