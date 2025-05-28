@@ -26,23 +26,64 @@ SELECT * FROM transacciones_credito;
 -- 4. Eliminar una fila por error
 DELETE FROM transacciones_credito WHERE id_transaccion = 'T003';
 
+SELECT LAST_QUERY_ID();
+--'01bca3f5-0000-1fc7-000a-ca8b000770ee'
+
 -- 5. Consultar el estado de la tabla justo antes del DELETE
 SELECT * FROM transacciones_credito 
-  BEFORE (STATEMENT => LAST_QUERY_ID());
+  BEFORE (STATEMENT => '01bca3f5-0000-1fc7-000a-ca8b000770ee');
+
 
 -- 6. Restaurar la fila eliminada
 INSERT INTO transacciones_credito
 SELECT * FROM transacciones_credito 
-  BEFORE (STATEMENT => LAST_QUERY_ID())
+  BEFORE (STATEMENT => '01bca3f5-0000-1fc7-000a-ca8b000770ee')
 WHERE id_transaccion = 'T003';
 
--- 7. Crear una tabla clonada con el estado anterior
-CREATE OR REPLACE TABLE transacciones_backup 
-  CLONE transacciones_credito 
-  AT (OFFSET => -300); -- aproximadamente 5 minutos atrás
+--Revision tabla
+SELECT 
+  TABLE_CATALOG,
+  TABLE_SCHEMA,
+  TABLE_NAME,
+  CREATED
+FROM 
+  WORKSHOP.INFORMATION_SCHEMA.TABLES
+WHERE 
+  TABLE_SCHEMA = 'BRONZE_MERCADEO'
+  AND TABLE_NAME = 'TRANSACCIONES_CREDITO';
 
+
+SELECT 
+  QUERY_ID,
+  START_TIME,
+  END_TIME,
+  EXECUTION_STATUS,
+  QUERY_TEXT
+FROM 
+  TABLE(INFORMATION_SCHEMA.QUERY_HISTORY())
+WHERE 
+  QUERY_ID = '01bca3f5-0000-1fc7-000a-ca8b000770ee';
+
+
+  SELECT 
+  DATEDIFF(MINUTE, START_TIME, CURRENT_TIMESTAMP) AS minutos_desde_ejecucion,
+  START_TIME,
+  CURRENT_TIMESTAMP
+FROM 
+  TABLE(INFORMATION_SCHEMA.QUERY_HISTORY())
+WHERE 
+  QUERY_ID = '01bca3f5-0000-1fc7-000a-ca8b000770ee';
+
+
+
+-- 7. Crear una tabla clonada con el estado anterior
+CREATE OR REPLACE TABLE transacciones_clone 
+  CLONE transacciones_credito 
+  AT (OFFSET => -910); -- aproximadamente 15 minutos atrás
+
+    
 -- 8. Verificar contenido restaurado
-SELECT * FROM transacciones_credito;
+SELECT * FROM transacciones_clone;
 
 -- 9. Eliminar completamente la tabla (simular un error)
 DROP TABLE transacciones_credito;
